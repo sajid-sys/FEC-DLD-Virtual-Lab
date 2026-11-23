@@ -1,0 +1,11 @@
+{
+  "name": "fec-dld-virtual-lab",
+  "version": "1.0.0",
+  "author": "Shahriar Hossen Sajid",
+  "description": "FEC DLD Virtual Lab — virtual digital logic design lab: trainer board, breadboard and 74LS ICs in the browser",
+  "private": true,
+  "scripts": {
+    "test": "node tests/run-tests.js",
+    "start": "npx --yes serve ."
+  }
+}
