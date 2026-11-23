@@ -226,8 +226,8 @@ function renderCoach(){
 }
 $('#coach').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
   if(b.dataset.g==='add')addIC(b.dataset.t,true);else if(b.dataset.g==='off'){guideOn=false;renderDyn();renderSheetGuideBtn();save();}
-  else if(b.dataset.g==='check'){$('#side').classList.add('open');doCheck();}});
-function setGuide(on){if(on&&!curExp){toast('Pick an experiment first — the guide shows its connections on the board.');selectTab('exp');$('#side').classList.add('open');return;}
+  else if(b.dataset.g==='check'){showSide();doCheck();}});
+function setGuide(on){if(on&&!curExp){toast('Pick an experiment first — the guide shows its connections on the board.');selectTab('exp');showSide();return;}
   guideOn=on;lastDone=-1;renderDyn();renderSheetGuideBtn();save();if(on){closeSheetMobile();requestAnimationFrame(fitIfCoachCovers);}}
 function fitIfCoachCovers(){const c=$('#coach');if(c.style.display==='none')return;const a=c.getBoundingClientRect(),b=$('#board').getBoundingClientRect();
   if(a.bottom>b.top&&a.top<b.bottom&&a.right>b.left&&a.left<b.right){const r=svgEl.getBoundingClientRect();if(guidePadT(r,(r.width-(innerWidth>900?84:70)-10)/PW)>10)fit();}}
@@ -355,8 +355,11 @@ function addIC(type,quiet){
 function closeSheetMobile(){$('#side').classList.remove('open');}
 
 // ---------- modal ----------
-function openModal(h){$('#dlg').innerHTML=h;$('#modal').classList.add('show');const f=$('#dlg').querySelector('.pri,button,textarea');f&&f.focus();}
-function closeModal(){$('#modal').classList.remove('show');}
+function openModal(h,kind){const d=$('#dlg');d.innerHTML=h;d.dataset.kind=kind||'';$('#modal').classList.add('show');const f=d.querySelector('button:not(.x),textarea');f&&f.focus();}
+// Closing the welcome screen in any way (×, Explore on my own, Start, Esc, outside click) means it is not shown again.
+const WELCOMED='dldlab.welcomed';
+function closeModal(){if($('#dlg').dataset.kind==='welcome'){try{localStorage.setItem(WELCOMED,'1');}catch(e){}}$('#modal').classList.remove('show');}
+function welcomeSeen(){try{return localStorage.getItem(WELCOMED)==='1';}catch(e){return false;}}
 $('#modal').addEventListener('click',e=>{if(e.target.id==='modal'||e.target.closest('[data-close]'))closeModal();});
 function confirmBox(title,text,okLabel,fn){openModal(`<h2>${esc(title)}</h2><p>${esc(text)}</p><div class="actions"><button class="btn" data-close>Cancel</button><button class="btn pri" id="okB">${esc(okLabel)}</button></div>`);$('#okB').onclick=()=>{closeModal();fn();};}
 function pinoutSVG(num){const ch=CHIPS[num],h=ch.pins/2,ph=26,H=h*ph+24,W=360,bx=130,bw=100;
@@ -371,9 +374,9 @@ function welcome(){
   const ill1=`<svg viewBox="0 0 120 80"><rect x="12" y="10" width="44" height="28" rx="6" fill="#fff" stroke="#1E3A5F" stroke-width="2"/><rect x="64" y="10" width="44" height="28" rx="6" fill="#fff" stroke="#1E3A5F" stroke-width="2"/><rect x="12" y="44" width="44" height="28" rx="6" fill="#fff" stroke="#15803D" stroke-width="2.5"/><rect x="64" y="44" width="44" height="28" rx="6" fill="#fff" stroke="#1E3A5F" stroke-width="2"/><path d="M20 24h10a7 7 0 0 1 0 0" stroke="#1E3A5F" stroke-width="2"/><path d="M22 18h8a6 6 0 0 1 0 12h-8z" fill="#E9EEF5" stroke="#1E3A5F" stroke-width="1.6"/><path d="M73 18q10 0 16 6q-6 6 -16 6q4 -6 0 -12z" fill="#E9EEF5" stroke="#1E3A5F" stroke-width="1.6"/><circle cx="48" cy="52" r="5" fill="#15803D"/></svg>`;
   const ill2=`<svg viewBox="0 0 120 80"><rect x="8" y="14" width="104" height="54" rx="5" fill="#F1EFE9" stroke="#D2CCC0"/><rect x="36" y="34" width="44" height="14" rx="2" fill="#1C1C1F"/>${[0,1,2,3,4,5,6,7,8,9].map(i=>`<rect x="${14+i*10}" y="20" width="4" height="4" fill="#2F2F31"/><rect x="${14+i*10}" y="58" width="4" height="4" fill="#2F2F31"/>`).join('')}<rect x="80" y="16" width="12" height="50" rx="4" fill="rgba(245,158,11,.3)" stroke="#F59E0B" stroke-width="2"/><path d="M86 22Q70 2 30 8" stroke="#F59E0B" stroke-width="3" stroke-dasharray="5 4" fill="none"/></svg>`;
   const ill3=`<svg viewBox="0 0 120 80"><rect x="14" y="10" width="92" height="58" rx="6" fill="#fff" stroke="#CBD5E1"/>${[0,1,2,3].map(i=>`<line x1="14" x2="106" y1="${24+i*11}" y2="${24+i*11}" stroke="#E2E8F0"/>`).join('')}<circle cx="86" cy="30" r="4" fill="#EF4444"/><circle cx="86" cy="52" r="4" fill="#EF4444"/><circle cx="60" cy="44" r="20" fill="#15803D"/><path d="M50 44l7 7 13-14" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-  openModal(`<div style="display:flex;align-items:center;gap:14px"><img src="assets/logo.png" width="64" height="64" alt="Faridpur Engineering College logo"><div><h2 style="margin:0">Welcome to FEC DLD Virtual Lab</h2><p class="muted" style="margin:2px 0 0">Faridpur Engineering College · Digital Logic Design lab</p></div></div><p class="muted">A trainer board, breadboard and 74LS chips — wire them up just as you would in the real lab.</p>
+  openModal(`<button class="x" data-close aria-label="Close" title="Close"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div style="display:flex;align-items:center;gap:14px;padding-right:30px"><img src="assets/logo.png" width="64" height="64" alt="Faridpur Engineering College logo"><div><h2 style="margin:0">Welcome to FEC DLD Virtual Lab</h2><p class="muted" style="margin:2px 0 0">Faridpur Engineering College · Digital Logic Design lab</p></div></div><p class="muted">A trainer board, breadboard and 74LS chips — wire them up just as you would in the real lab.</p>
   <div class="welcome"><div>${ill1}<b>1 · Pick an experiment</b>Gates, adders, encoders, decoders, MUX, DEMUX and comparators.</div><div>${ill2}<b>2 · Follow the glow</b>Guide mode lights up each hole to connect, one wire at a time.</div><div>${ill3}<b>3 · Check your circuit</b>The lab tests every row of the truth table for you.</div></div>
-  <div class="actions"><button class="btn" data-close>Explore on my own</button><button class="btn pri" id="startB">Start with the AND gate</button></div><p class="muted small" style="text-align:center;margin:14px 0 0">Developed and maintained by <b>Shahriar Hossen Sajid</b></p>`);
+  <div class="actions"><button class="btn" data-close>Explore on my own</button><button class="btn pri" id="startB">Start with the AND gate</button></div><p class="muted small" style="text-align:center;margin:14px 0 0">Developed and maintained by <b>Shahriar Hossen Sajid</b></p>`,'welcome');
   $('#startB').onclick=()=>{closeModal();openExp('and');setGuide(true);};
 }
 
@@ -487,6 +490,38 @@ function renderGuide(){
   $('#tourB').onclick=welcome;
 }
 
+// ---------- side panel: resize + collapse (desktop; phones keep the bottom sheet) ----------
+const SIDE_MIN=280,SIDE_DEF=400,SIDE_HIDE_AT=160,sideMax=()=>Math.max(SIDE_MIN,Math.round(innerWidth*.55));
+let side={w:SIDE_DEF,collapsed:false};try{const d=JSON.parse(localStorage.getItem('dldlab.side'));if(d)side={w:+d.w||SIDE_DEF,collapsed:!!d.collapsed};}catch(e){}
+const mainEl=$('main'),grip=$('#sideGrip'),isDesk=()=>innerWidth>900;
+const clampW=w=>Math.max(SIDE_MIN,Math.min(sideMax(),Math.round(w)));
+function applySide(){const w=clampW(side.w);mainEl.style.setProperty('--sideW',w+'px');mainEl.classList.toggle('collapsed',side.collapsed);
+  grip.setAttribute('aria-valuenow',w);grip.setAttribute('aria-valuemin',SIDE_MIN);grip.setAttribute('aria-valuemax',sideMax());
+  $('#sideHide').setAttribute('aria-expanded',!side.collapsed);$('#sideShow').setAttribute('aria-expanded',!side.collapsed);}
+function saveSide(){try{localStorage.setItem('dldlab.side',JSON.stringify(side));}catch(e){}}
+function setSideW(w){side.w=clampW(w);applySide();fit();saveSide();}
+function setCollapsed(c,focus){side.collapsed=c;applySide();saveSide();
+  requestAnimationFrame(()=>{fit();if(focus)(c?$('#sideShow'):$('#sideHide')).focus({preventScroll:true});});}
+// Bring the panel into view: expand it on desktop, slide the sheet up on phones.
+function showSide(){if(isDesk()){if(side.collapsed)setCollapsed(false);}else $('#side').classList.add('open');}
+let sDrag=null;
+grip.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();grip.setPointerCapture(e.pointerId);
+  sDrag={x0:mainEl.getBoundingClientRect().left,w0:clampW(side.w)};document.body.classList.add('side-resizing');});
+grip.addEventListener('pointermove',e=>{if(!sDrag)return;const x=e.clientX-sDrag.x0;
+  $('#side').classList.toggle('will-collapse',x<SIDE_HIDE_AT);side.w=clampW(x);applySide();fit();});
+function endSideDrag(e){if(!sDrag)return;const x=e.clientX-sDrag.x0,w0=sDrag.w0;sDrag=null;
+  document.body.classList.remove('side-resizing');$('#side').classList.remove('will-collapse');
+  if(e.type==='pointerup'&&x<SIDE_HIDE_AT){side.w=w0;setCollapsed(true);}else saveSide();}
+grip.addEventListener('pointerup',endSideDrag);grip.addEventListener('pointercancel',endSideDrag);
+grip.addEventListener('dblclick',()=>setSideW(SIDE_DEF));
+grip.addEventListener('keydown',e=>{const w=clampW(side.w),st=e.shiftKey?60:20;
+  const nw={ArrowLeft:w-st,ArrowRight:w+st,Home:SIDE_MIN,End:sideMax()}[e.key];
+  if(nw!==undefined){e.preventDefault();setSideW(nw);}else if(e.key==='Enter'){e.preventDefault();setCollapsed(true,true);}});
+$('#sideHide').onclick=()=>setCollapsed(true,true);
+$('#sideShow').onclick=()=>setCollapsed(false,true);
+addEventListener('resize',applySide);
+applySide();
+
 // ---------- init ----------
 try{if(localStorage.getItem('dldlab.theme')==='dark')document.documentElement.dataset.theme='dark';}catch(e){}
 (function init(){
@@ -496,5 +531,5 @@ try{if(localStorage.getItem('dldlab.theme')==='dark')document.documentElement.da
   renderExpList();renderParts();renderGuide();if(curExp)renderSheet();
   renderDyn();updateUndo();requestAnimationFrame(fit);
   let rt,lw=0;new ResizeObserver(()=>{const w=$('#benchWrap').clientWidth;if(Math.abs(w-lw)<2&&lw)return;lw=w;clearTimeout(rt);rt=setTimeout(fit,80);}).observe($('#benchWrap'));
-  if(!d)setTimeout(welcome,300);
+  if(!d&&!welcomeSeen())setTimeout(welcome,300);
 })();
