@@ -1,0 +1,50 @@
+name: Bug report
+description: Something in the lab does not work as it should.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting! The more exact you are, the faster it gets fixed. For a security problem, use the Security tab instead (see SECURITY.md).
+  - type: input
+    id: experiment
+    attributes:
+      label: Experiment or chip
+      description: Which experiment were you doing, or which chip is affected?
+      placeholder: e.g. Decade counter (7490)
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+      placeholder: |
+        1. Opened …
+        2. Wired …
+        3. Expected L0 to light, but …
+    validations:
+      required: true
+  - type: textarea
+    id: code
+    attributes:
+      label: Circuit code (optional)
+      description: In the ICs tab press "Save circuit code" and paste it here. It lets us load your exact circuit.
+      render: text
+  - type: dropdown
+    id: device
+    attributes:
+      label: Device
+      options:
+        - Phone
+        - Tablet
+        - Laptop / desktop
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+      placeholder: e.g. Chrome on Android
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Screenshot (optional)
+      description: Drag an image here.

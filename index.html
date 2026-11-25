@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+<!-- FEC DLD Virtual Lab — developed and maintained by Shahriar Hossen Sajid.
+     Copyright (C) 2026 Shahriar Hossen Sajid. Free software under the GNU GPL v3.0 with additional terms:
+     see LICENSE and ADDITIONAL-TERMS.md. Source: https://github.com/sajid-sys/FEC-DLD-Virtual-Lab -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -54,12 +57,13 @@
       <filter id="glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
       <filter id="smoke" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="5"/></filter>
     </defs>
-    <g id="vp"><g id="board"></g><g id="icL"></g><g id="wireL"></g><g id="tagL"></g><g id="guideL"></g><g id="hlL"></g><g id="pendL"></g></g>
+    <g id="vp"><g id="board"></g><g id="icL"></g><g id="wireL"></g><g id="flowL"></g><g id="tagL"></g><g id="guideL"></g><g id="fxL"></g><g id="hlL"></g><g id="pendL"></g></g>
   </svg>
   <div id="tools">
     <button class="tool" id="sideShow" aria-controls="side" title="Show the experiments panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M13 9l3 3-3 3"/></svg>Panel</button>
     <button class="tool" id="tGuide" aria-pressed="false" title="Show the next connection on the board"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg>Guide</button>
     <button class="tool" id="tSig" aria-pressed="false" title="Colour wires by logic level"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 17h4V7h5v10h4V7h5v10h2"/></svg>Signals</button>
+    <button class="tool" id="tFlow" aria-pressed="true" title="Moving dots show HIGH signals flowing along the wires"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4M10 12h4"/><path d="M17 8l4 4-4 4"/><circle cx="5" cy="12" r=".6" fill="currentColor"/></svg>Flow</button>
     <button class="tool" id="tPwr" aria-pressed="true" title="Trainer power"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v9M6.3 6.3a8 8 0 1 0 11.4 0"/></svg>Power</button>
   </div>
   <div id="coach" role="status" aria-live="polite"></div>

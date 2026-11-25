@@ -1,0 +1,29 @@
+name: New chip or experiment
+description: Suggest an IC or an experiment for the lab.
+labels: [enhancement]
+body:
+  - type: input
+    id: chip
+    attributes:
+      label: Chip(s)
+      placeholder: e.g. 74LS83, CD4511
+    validations:
+      required: true
+  - type: textarea
+    id: experiment
+    attributes:
+      label: Experiment
+      description: What should students build and learn? Which inputs and outputs?
+    validations:
+      required: true
+  - type: input
+    id: datasheet
+    attributes:
+      label: Datasheet link
+      description: An official datasheet (Texas Instruments, onsemi, Nexperia…) so the pinout can be checked.
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Can you help?
+      options:
+        - label: I would like to add this myself (see CONTRIBUTING.md)

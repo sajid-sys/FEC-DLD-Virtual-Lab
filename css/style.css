@@ -1,3 +1,5 @@
+/* FEC DLD Virtual Lab — developed and maintained by Shahriar Hossen Sajid.
+   Copyright (C) 2026 Shahriar Hossen Sajid. SPDX-License-Identifier: GPL-3.0-only (with additional terms, see ADDITIONAL-TERMS.md) */
 :root{
   --bg:#F8FAFC; --card:#FFFFFF; --ink:#0F172A; --muted:#475569; --line:#CBD5E1; --soft:#E9EEF5;
   --primary:#1E3A5F; --on-primary:#fff; --blue:#2563EB; --accent:#A16207; --accent-soft:#FEF3C7;
@@ -70,9 +72,13 @@ p{margin:6px 0}
 .grp .n{font-size:12px;color:var(--muted);font-weight:400}
 .prog{background:var(--soft);border-radius:999px;height:10px;overflow:hidden;margin:6px 0 4px}
 .prog i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#F59E0B);border-radius:999px;transition:width .4s}
+.prog i.sx{width:100%;transform-origin:left center;transition:transform .35s ease-out}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(136px,100%),1fr));gap:8px}
 .card{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;padding:10px 10px 9px;border:1px solid var(--line);border-radius:12px;background:var(--card);position:relative;transition:border-color .15s,box-shadow .15s;min-height:112px}
-.card:hover{border-color:var(--primary);box-shadow:0 4px 14px rgba(15,23,42,.12)}
+.card:hover{border-color:var(--primary)}
+/* cards lift with a soft shadow on devices that can hover (the shadow fades via opacity) */
+.card::after{content:"";position:absolute;inset:-1px;border-radius:inherit;box-shadow:0 8px 20px rgba(15,23,42,.16);opacity:0;transition:opacity .15s;pointer-events:none}
+@media (hover:hover){.card{transition:transform .15s ease-out,border-color .15s}.card:hover{transform:translateY(-2px)}.card:hover::after{opacity:1}}
 .card svg.ico{width:72px;height:44px;margin-bottom:2px}
 .card .t{font-weight:700;line-height:1.25}
 .card .c{font-size:12px;color:var(--muted)}
@@ -111,16 +117,20 @@ table.tt{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}
 .result.bad{background:var(--danger-soft);color:var(--danger)}
 .result ul{margin:6px 0 0;padding-left:18px;font-weight:400;color:var(--ink)}
 .parts{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:6px}
-.part{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px}
+.part{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;container-type:inline-size;min-width:0}
+/* Pinout + Add: side by side, stacked (Add under Pinout) when the card is narrow */
+.pbtns{flex:none;display:flex;gap:6px;align-items:stretch}
+@container (max-width:300px){.pbtns{flex-direction:column}.pbtns .btn{justify-content:center}}
 .part .nm{font-weight:700;min-width:72px}
-.part .ds{flex:1;font-size:13px;color:var(--muted);line-height:1.3}
+.part .ds{flex:1;min-width:0;font-size:13px;color:var(--muted);line-height:1.3;overflow-wrap:anywhere}
 .part svg{flex:none}
 .guide li{margin:5px 0}
 kbd{font-family:var(--ui);font-size:12px;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 5px;background:var(--card)}
 
 #benchWrap{position:relative;min-width:0;min-height:0;overflow:hidden;background-color:var(--mat);background-image:radial-gradient(var(--mat-dot) 1.2px,transparent 1.3px);background-size:22px 22px}
 #bench{width:100%;height:100%;display:block;touch-action:none;user-select:none;-webkit-user-select:none}
-#tip{position:absolute;pointer-events:none;background:#0F172A;color:#F1F5F9;font-size:13px;padding:6px 9px;border-radius:7px;max-width:280px;line-height:1.35;display:none;z-index:6;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+#tip{position:absolute;pointer-events:none;background:#0F172A;color:#F1F5F9;font-size:13px;padding:6px 9px;border-radius:7px;max-width:280px;line-height:1.35;opacity:0;visibility:hidden;transition:opacity .12s ease-out,visibility 0s .12s;z-index:6;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+#tip.show{opacity:1;visibility:visible;transition:opacity .12s ease-out}
 #tip .v{display:inline-block;font-weight:700;border-radius:4px;padding:0 5px;margin-left:4px}
 .v1{background:#DC2626;color:#fff}.v0{background:#15803D;color:#fff}.vz{background:#A16207;color:#fff}.vx{background:#7C3AED;color:#fff}
 #tools{position:absolute;left:12px;top:12px;display:flex;flex-direction:column;gap:6px;z-index:4}
@@ -179,11 +189,19 @@ kbd{font-family:var(--ui);font-size:12px;border:1px solid var(--line);border-bot
 .sock-ring{fill:#C9A24B;stroke:#8C6A20;stroke-width:1.5}
 .sock-hole{fill:#1A1A1A}
 .led-bez{fill:#0E1E31;stroke:#3F5E84;stroke-width:1.5}
-.led-lens{fill:#4A1717;transition:fill .08s}
-.led-lens.on{fill:#FF4136;filter:url(#glow)}
+.led-lens{fill:#4A1717}
+#pwr-led.on{fill:#FF4136;filter:url(#glow)}
+/* LED light is a separate layer that fades (opacity only) */
+.led-glow{fill:#FF4136;filter:url(#glow);opacity:0;transition:opacity .12s ease-out;pointer-events:none}
+.led-glow.on{opacity:1}
 .sw-slot{fill:#0E1E31;stroke:#3F5E84}
-.sw-lever{fill:#E5E7EB;stroke:#9CA3AF;transition:y .08s}
+.sw-lever{fill:#E5E7EB;stroke:#9CA3AF;transition:transform .2s cubic-bezier(.34,1.56,.64,1)}
+.sw-lever.up{transform:translateY(-26px)}
 .sw-hit{fill:transparent;cursor:pointer}
+.clk-cap{fill:#E5E7EB;stroke:#9CA3AF;stroke-width:2;transition:fill .08s}
+.clk-cap.on{fill:#F59E0B;stroke:#FCD34D;filter:url(#glow)}
+.part[hidden],.parts[hidden],.grp[hidden]{display:none}
+.search{width:100%;height:38px;border:1px solid var(--line);border-radius:8px;padding:0 12px;margin:2px 0 6px;font:inherit;font-size:14px;background:var(--card);color:var(--ink)}
 .pwr{cursor:pointer}
 .ic-body{fill:#1C1C1F;stroke:#000;stroke-width:1}
 .ic-sel .ic-body{stroke:#F59E0B;stroke-width:3}
@@ -195,18 +213,18 @@ kbd{font-family:var(--ui);font-size:12px;border:1px solid var(--line);border-bot
 .wire-hit{stroke:transparent;stroke-width:14;fill:none;cursor:pointer}
 .wire-sh{fill:none;stroke:rgba(0,0,0,.45);stroke-width:6;stroke-linecap:round;pointer-events:none}
 .wire{fill:none;stroke-width:4;stroke-linecap:round;pointer-events:none}
-.wire.flow{stroke-dasharray:12 7;animation:dash .7s linear infinite}
+.wire.flow{stroke-dasharray:12 7;animation:dash .7s linear infinite;animation-delay:var(--wph,0s)}
 .wire.fz{stroke-dasharray:3 6}
 .wire-sel{fill:none;stroke:#F59E0B;stroke-width:9;stroke-linecap:round;opacity:.65;pointer-events:none}
 .wire-end{stroke:#555;stroke-width:1;pointer-events:none}
-.hl-strip{fill:rgba(34,197,94,.22);stroke:#16A34A;stroke-width:1.5;pointer-events:none}
-.hl-net{fill:none;stroke:#22C55E;stroke-width:2.5;pointer-events:none}
+.hl-strip{fill:rgba(34,197,94,.22);stroke:#16A34A;stroke-width:1.5;pointer-events:none;animation:fadein .14s ease-out}
+.hl-net{fill:none;stroke:#22C55E;stroke-width:2.5;pointer-events:none;animation:fadein .14s ease-out}
 .pend{fill:none;stroke:#F59E0B;stroke-width:3.5;stroke-dasharray:7 5;pointer-events:none}
 .tag rect{fill:#F59E0B}
 .tag text{fill:#1F1300;font:700 11px var(--ui);text-anchor:middle}
-.gpulse{fill:none;stroke:#F59E0B;stroke-width:3.5;animation:gp 1.1s ease-in-out infinite;pointer-events:none}
-.gfill{fill:rgba(245,158,11,.25);stroke:#F59E0B;stroke-width:2.5;animation:gp 1.1s ease-in-out infinite;pointer-events:none}
-.gline{fill:none;stroke:#F59E0B;stroke-width:3;stroke-dasharray:8 7;animation:dash .8s linear infinite;pointer-events:none;opacity:.9}
+.gpulse{fill:none;stroke:#F59E0B;stroke-width:3.5;animation:gp 1.1s ease-in-out infinite;animation-delay:var(--gph,0s);pointer-events:none}
+.gfill{fill:rgba(245,158,11,.25);stroke:#F59E0B;stroke-width:2.5;animation:gp 1.1s ease-in-out infinite;animation-delay:var(--gph,0s);pointer-events:none}
+.gline{fill:none;stroke:#F59E0B;stroke-width:3;stroke-dasharray:8 7;animation:dash .8s linear infinite;animation-delay:var(--glph,0s);pointer-events:none;opacity:.9}
 .gbub{pointer-events:none}.gbub rect{fill:#F59E0B}.gbub text{fill:#1F1300;font:700 12px var(--ui);text-anchor:middle}
 @keyframes gp{50%{opacity:.35}}
 @keyframes dash{to{stroke-dashoffset:-38}}
@@ -231,4 +249,31 @@ kbd{font-family:var(--ui);font-size:12px;border:1px solid var(--line);border-bot
   #coach .k{grid-column:1;font-size:11px} #coach .m{grid-column:1;font-size:14px;margin:0}
   #coach .prog,#coach .h{display:none} #coach .row{grid-column:2;grid-row:1/3;margin:0;justify-content:flex-end}
 }
-@media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} }
+@media (prefers-reduced-motion:reduce){ *,*::before,*::after{transition:none!important;animation:none!important} }
+html.rm *,html.rm *::before,html.rm *::after{transition:none!important;animation:none!important}
+html.boot *{transition:none!important}
+html.hid .fdot,html.hid .gpulse,html.hid .gfill,html.hid .gline,html.hid .smoke,html.hid .dot-blink,html.hid .wire.flow{animation-play-state:paused}
+@keyframes fadein{from{opacity:0}}
+/* signal flow: dots (zero-length round dashes) moving along HIGH wires from the driver to the inputs */
+.fdot{fill:none;stroke:#FFF4C2;stroke-width:3.4;stroke-linecap:round;stroke-dasharray:0 22;opacity:.95;animation:fdot .6s linear infinite;animation-delay:var(--fph,0s);pointer-events:none}
+@keyframes fdot{from{stroke-dashoffset:22}to{stroke-dashoffset:0}}
+/* faults */
+.smoke{opacity:.6;animation:smokeup 1.8s ease-out infinite;animation-delay:var(--sph,0s)}
+@keyframes smokeup{0%{transform:translateY(4px);opacity:.65}100%{transform:translateY(-18px);opacity:0}}
+.dot-blink{fill:#F59E0B;animation:blink 1.6s ease-in-out infinite;animation-delay:var(--bph,0s);pointer-events:none}
+@keyframes blink{0%,100%{opacity:0}50%{opacity:1}}
+.fx-short{fill:none;stroke:#EF4444;stroke-width:7;stroke-linecap:round;opacity:0;animation:flash2 .6s ease-in-out;pointer-events:none}
+@keyframes flash2{0%,50%,100%{opacity:0}25%,75%{opacity:.95}}
+.fx-spark{stroke:#FDE047;stroke-width:2.5;stroke-linecap:round;fill:none;transform-box:fill-box;transform-origin:center;animation:spark .45s ease-out forwards;pointer-events:none}
+@keyframes spark{0%{transform:scale(.3);opacity:1}100%{transform:scale(1.5);opacity:0}}
+/* placement feedback */
+.fx-pulse{fill:rgba(34,197,94,.25);stroke:#22C55E;stroke-width:2;transform-box:fill-box;transform-origin:center;animation:spulse .45s ease-out forwards;pointer-events:none}
+@keyframes spulse{0%{opacity:0;transform:scale(.92)}35%{opacity:1}100%{opacity:0;transform:scale(1.12)}}
+.fx-tick{transform-box:fill-box;transform-origin:center;animation:tick 1.1s ease-out forwards;pointer-events:none}
+.fx-tick circle{fill:#16A34A;stroke:#fff;stroke-width:2}.fx-tick path{fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+@keyframes tick{0%{transform:scale(.3);opacity:0}18%{transform:scale(1.15);opacity:1}30%{transform:scale(1)}75%{opacity:1}100%{opacity:0;transform:translateY(-8px)}}
+/* circuit diagram: colours change smoothly when an input flips */
+#schBox polyline,#schBox circle,#schBox rect{transition:stroke .15s,fill .15s}
+.sweep{display:flex;align-items:center;justify-content:space-between;gap:10px;border-radius:10px;padding:8px 12px;margin:10px 0;background:var(--soft);font-weight:700}
+.chk{display:flex;align-items:center;gap:8px;font-weight:700;cursor:pointer}.chk input{width:18px;height:18px;accent-color:var(--primary)}
+@media (prefers-reduced-motion:reduce){ *,*::before,*::after{transition:none!important;animation:none!important} }

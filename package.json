@@ -2,8 +2,17 @@
   "name": "fec-dld-virtual-lab",
   "version": "1.0.0",
   "author": "Shahriar Hossen Sajid",
-  "description": "FEC DLD Virtual Lab — virtual digital logic design lab: trainer board, breadboard and 74LS ICs in the browser",
+  "description": "FEC DLD Virtual Lab — open-source virtual digital logic design lab: trainer board, breadboard and 74-series / 4000-series ICs in the browser",
   "private": true,
+  "license": "GPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sajid-sys/FEC-DLD-Virtual-Lab.git"
+  },
+  "homepage": "https://sajid-sys.github.io/FEC-DLD-Virtual-Lab/",
+  "bugs": {
+    "url": "https://github.com/sajid-sys/FEC-DLD-Virtual-Lab/issues"
+  },
   "scripts": {
     "test": "node tests/run-tests.js",
     "start": "npx --yes serve ."
